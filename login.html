@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Access Control | MRF</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="login-body">
+
+    <div class="login-container">
+        <div class="login-header">
+            <div class="logo-box">MRF</div>
+            <h2 id="form-title">System Access</h2>
+        </div>
+
+        <form id="login-form">
+            <div class="input-group">
+                <label>Operator ID</label>
+                <input type="text" id="username" required placeholder="Enter Username" autocomplete="off">
+            </div>
+
+            <div class="input-group">
+                <label>Security Key</label>
+                <input type="password" id="password" required placeholder="Enter Password">
+            </div>
+
+            <!-- New Field for Registration (Hidden by default) -->
+            <div class="input-group hidden" id="confirm-pass-group">
+                <label>Confirm Key</label>
+                <input type="password" id="confirm-password" placeholder="Repeat Password">
+            </div>
+
+            <div id="msg-box" class="message-box"></div>
+
+            <button type="submit" class="login-btn" id="submit-btn">
+                <span>Initialize Session</span>
+                <div class="btn-arrow">→</div>
+            </button>
+
+            <!-- New Toggle Option -->
+            <div class="signup-option">
+                <span id="toggle-text">New User?</span>
+                <a href="#" id="toggle-auth">Create Account</a>
+            </div>
+        </form>
+
+        <div class="login-footer">
+            <p>Authorized Personnel Only</p>
+            <p>Mumbai Route Finder v1.0</p>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('login-form');
+        const msgBox = document.getElementById('msg-box');
+        const btn = document.getElementById('submit-btn');
+        const btnText = btn.querySelector('span');
+        
+        // Toggle Elements
+        const toggleLink = document.getElementById('toggle-auth');
+        const toggleText = document.getElementById('toggle-text');
+        const formTitle = document.getElementById('form-title');
+        const confirmGroup = document.getElementById('confirm-pass-group');
+        const confirmInput = document.getElementById('confirm-password');
+
+        let isLoginMode = true;
+
+        // Toggle Login/Register Mode
+        toggleLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            isLoginMode = !isLoginMode;
+            
+            // Reset Form UI
+            msgBox.style.display = 'none';
+            form.reset();
+
+            if (!isLoginMode) {
+                // Switch to Register
+                formTitle.innerText = "New Registration";
+                btnText.innerText = "Register System";
+                toggleText.innerText = "Existing User?";
+                toggleLink.innerText = "Sign In";
+                confirmGroup.classList.remove('hidden');
+                confirmInput.setAttribute('required', 'true');
+                btn.style.background = "#000"; // Reset color
+            } else {
+                // Switch to Login
+                formTitle.innerText = "System Access";
+                btnText.innerText = "Initialize Session";
+                toggleText.innerText = "New User?";
+                toggleLink.innerText = "Create Account";
+                confirmGroup.classList.add('hidden');
+                confirmInput.removeAttribute('required');
+            }
+        });
+
+        // Dynamic Input Focus Effects
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('focus', () => input.parentElement.classList.add('focused'));
+            input.addEventListener('blur', () => input.parentElement.classList.remove('focused'));
+        });
+
+        // Handle Submit
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const confirmPass = confirmInput.value;
+
+            // Basic Client-Side Validation
+            if (!isLoginMode && password !== confirmPass) {
+                showError("Security Keys do not match");
+                return;
+            }
+
+            // Loading UI
+            const originalText = btnText.innerText;
+            btnText.innerText = isLoginMode ? "AUTHENTICATING..." : "REGISTERING...";
+            btn.style.background = "#fff";
+            btn.style.color = "#000";
+            msgBox.style.display = 'none';
+
+            try {
+                // Use the same endpoint for demo (In real app, use /api/register)
+                const endpoint = '/api/login'; 
+                
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        username, 
+                        password, 
+                        mode: isLoginMode ? 'login' : 'register' // Send mode to server
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    btn.style.background = "#4ade80"; // Green
+                    btnText.innerText = "ACCESS GRANTED";
+                    setTimeout(() => window.location.href = 'index.html', 1000);
+                } else {
+                    throw new Error(data.message);
+                }
+
+            } catch (error) {
+                btnText.innerText = originalText;
+                btn.style.background = "#000";
+                btn.style.color = "#fff";
+                showError(error.message || "Connection Failed");
+            }
+        });
+
+        function showError(msg) {
+            msgBox.innerText = isLoginMode ? "ACCESS DENIED: " + msg : "REGISTRATION FAILED: " + msg;
+            msgBox.style.display = 'block';
+            msgBox.classList.add('shake');
+            setTimeout(() => msgBox.classList.remove('shake'), 500);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking - MRF</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #C1FF72;
+            --dark: #000000;
+        }
+        body { background: var(--primary); min-height: 100vh; display: flex; align-items: center; justify-content: center; font-family: 'Space Grotesk', sans-serif; margin: 0; padding: 20px; }
+        .book-container { background: #fff; border: 4px solid #000; padding: 40px; box-shadow: 16px 16px 0 #000; width: 100%; max-width: 500px; }
+        h2 { font-weight: 900; font-size: 2.5rem; text-transform: uppercase; margin-bottom: 20px; text-align: center; margin-top: 0; }
+        .summary { background: #f3f4f6; border: 3px solid #000; padding: 20px; margin-bottom: 20px; font-weight: 700; line-height: 1.6; }
+        .summary-label { color: #666; font-size: 0.8rem; text-transform: uppercase; display: block; }
+        .summary-val { font-size: 1.2rem; display: block; margin-bottom: 10px; }
+        input { width: 100%; border: 3px solid #000; padding: 15px; margin-bottom: 15px; font-weight: 700; font-family: inherit; font-size: 1rem; box-sizing: border-box; }
+        input:focus { outline: none; background: #fafafa; }
+        .pay-btn { background: #000; color: #fff; width: 100%; padding: 20px; font-weight: 900; font-size: 1.2rem; cursor: pointer; border: none; text-transform: uppercase; transition: transform 0.2s; }
+        .pay-btn:hover { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 #666; }
+        #qr-section { text-align: center; display: none; }
+        .qr-img { border: 4px solid #000; margin: 20px 0; padding: 10px; background: white; }
+        .back-link { display: inline-block; margin-top: 20px; color: #000; font-weight: 900; text-decoration: none; text-transform: uppercase; border-bottom: 2px solid #000; }
+    </style>
+</head>
+<body>
+
+    <div class="book-container">
+        <!-- Form Step -->
+        <div id="form-section">
+            <h2>Ticket Desk</h2>
+            <div id="summary" class="summary"></div>
+            
+            <form id="book-form">
+                <div style="margin-bottom: 5px; font-weight: 900;">PASSENGER DETAILS</div>
+                <input type="text" required placeholder="Full Name">
+                <input type="number" required placeholder="Age" min="5" max="100">
+                <input type="date" required id="date-picker">
+
+                <button type="submit" class="pay-btn">Generate Payment QR</button>
+            </form>
+            <div style="text-align: center;">
+                <a href="index.html" class="back-link">&larr; Cancel Booking</a>
+            </div>
+        </div>
+
+        <!-- QR Step -->
+        <div id="qr-section">
+            <h2>Scan to Pay</h2>
+            <p style="font-weight:700; font-size: 1.1rem;">PhonePe / GPay / Paytm</p>
+            
+            <!-- Dynamic QR Code -->
+            <img id="qr-code" class="qr-img" src="" alt="Loading QR..." width="250" height="250">
+            
+            <h3 id="pay-amt" style="font-size:3rem; font-weight:900; margin: 10px 0;"></h3>
+            
+            <div style="background: #000; color: #fff; padding: 10px; display: inline-block; font-family: monospace;">
+                UPI: 9224271911@ybl
+            </div>
+            
+            <br><br>
+            <p style="font-size: 0.9rem; color: #666;">Keep this screen open until payment completes.</p>
+            
+            <a href="index.html" class="pay-btn" style="text-decoration:none; display:block; margin-top: 20px;">Download Ticket</a>
+        </div>
+    </div>
+
+    <script>
+        // Set today's date as default
+        document.getElementById('date-picker').valueAsDate = new Date();
+
+        const params = new URLSearchParams(window.location.search);
+        const mode = params.get('mode') || 'Travel';
+        const price = params.get('price') || '0';
+        const from = params.get('from') || 'Origin';
+        const to = params.get('to') || 'Destination';
+
+        // Display Summary
+        document.getElementById('summary').innerHTML = `
+            <span class="summary-label">Route</span>
+            <span class="summary-val">${from} <br>⬇<br> ${to}</span>
+            <span class="summary-label">Mode</span>
+            <span class="summary-val" style="text-transform: capitalize;">${mode}</span>
+            <hr style="border: 2px solid #000; margin: 10px 0;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-size: 1.5rem;">TOTAL</span>
+                <span style="font-size: 2rem;">₹${price}</span>
+            </div>
+        `;
+
+        document.getElementById('book-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            // Switch to QR View
+            document.getElementById('form-section').style.display = 'none';
+            document.getElementById('qr-section').style.display = 'block';
+            document.getElementById('pay-amt').innerText = '₹' + price;
+            
+            // Generate Real UPI QR Code
+            // Using standard UPI link format
+            const upiLink = `upi://pay?pa=9224271911@ybl&pn=MumbaiRouteBooking&am=${price}&cu=INR&tn=TicketBooking`;
+            
+            // Encode for QR API
+            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(upiLink)}`;
+            
+            document.getElementById('qr-code').src = qrUrl;
+        });
+    </script>
+</body>
+</html>

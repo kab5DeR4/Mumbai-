@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mumbai Route Finder | Roshan Nale Project</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+</head>
+<body>
+
+    <nav class="sticky top-0 z-[100] bg-white border-b-4 border-black py-4">
+        <div class="max-w-7xl mx-auto px-4 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="logo-box">MRF</div>
+                <span class="logo-text">Mumbai Route Finder</span>
+            </div>
+            <div class="nav-links">
+                <a href="#home" class="nav-link">Home</a>
+                <a href="#finder" class="nav-link">Route Finder</a>
+                <a href="#gallery" class="nav-link">Highlights</a>
+                <a href="#about" class="nav-link">About</a>
+            </div>
+            <div class="mobile-menu-btn" id="mobile-menu-btn">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </div>
+        </div>
+    </nav>
+
+    <div class="mobile-menu" id="mobile-menu">
+        <a href="#home" class="mobile-menu-link">Home</a>
+        <a href="#finder" class="mobile-menu-link">Route Finder</a>
+        <a href="#gallery" class="mobile-menu-link">Highlights</a>
+        <a href="#about" class="mobile-menu-link">About</a>
+    </div>
+
+    <main id="home">
+        <header class="hero-section">
+            <div class="max-w-7xl mx-auto px-4 grid lg:grid-cols-12 gap-12 items-center">
+                <div class="lg:col-span-7">
+                    <div class="badge">College Project 2024</div>
+                    <h1 class="hero-title">
+                        The Ultimate <br><span class="hero-highlight">Route Guide</span>
+                    </h1>
+                    <p class="hero-description">
+                        Discover the fastest, cheapest, and smartest ways to navigate through the heart of Mumbai with real-time fare estimation.
+                    </p>
+                    <div class="hero-actions">
+                        <a href="#finder" class="btn-primary">Start Searching</a>
+                        <div class="live-indicator">
+                            <span class="pulse-dot"></span>
+                            Live Traffic Data
+                        </div>
+                    </div>
+                </div>
+                <div class="lg:col-span-5">
+                    <div class="highlight-card">
+                        <div class="highlight-circle"></div>
+                        <h3 class="highlight-title">Mumbai Live</h3>
+                        <div id="highlight-content" class="highlight-content">
+                            <p class="loading-text">Fetching latest city updates...</p>
+                        </div>
+                        <div class="highlight-footer">
+                            <span class="highlight-label">Local News Feed</span>
+                            <div class="highlight-dots">
+                                <div class="dot filled"></div>
+                                <div class="dot empty"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <section id="map" class="finder-section">
+            <div class="max-w-7xl mx-auto px-4">
+                <h2 class="section-title">Mumbai Tourist Map</h2>
+                <div id="mumbaiMap" class="brutal-shadow"></div>
+            </div>
+        </section>
+
+        <section id="finder" class="finder-section">
+            <div class="max-w-5xl mx-auto px-4">
+                <div class="section-header">
+                    <h2 class="section-title">Route Discovery</h2>
+                    <p class="section-subtitle">Multi-Modal Fare Estimation Engine</p>
+                </div>
+
+                <div class="finder-card">
+                    <div class="input-grid">
+                        <div class="input-wrapper search-container">
+                            <label class="input-label">Pick-up Point</label>
+                            <input type="text" id="origin-input" placeholder="Enter starting location..." 
+                                class="location-input" autocomplete="off">
+                            <div id="origin-dropdown" class="dropdown-menu"></div>
+                        </div>
+
+                        <div class="swap-wrapper">
+                            <button id="swap-btn" class="swap-btn">
+                                <svg class="swap-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <div class="input-wrapper search-container">
+                            <label class="input-label">Destination</label>
+                            <input type="text" id="destination-input" placeholder="Where are you going?" 
+                                class="location-input" autocomplete="off">
+                            <div id="destination-dropdown" class="dropdown-menu"></div>
+                        </div>
+                    </div>
+
+                    <div class="mode-section">
+                        <span class="mode-label-text">Enable Transport Modes</span>
+                        <div class="mode-grid">
+                            <label class="mode-card">
+                                <input type="checkbox" checked value="train" class="mode-checkbox">
+                                <span class="mode-icon">🚆</span>
+                                <span class="mode-name">Train</span>
+                            </label>
+                            <label class="mode-card">
+                                <input type="checkbox" checked value="bus" class="mode-checkbox">
+                                <span class="mode-icon">🚌</span>
+                                <span class="mode-name">Bus</span>
+                            </label>
+                            <label class="mode-card">
+                                <input type="checkbox" checked value="metro" class="mode-checkbox">
+                                <span class="mode-icon">🚇</span>
+                                <span class="mode-name">Metro</span>
+                            </label>
+                            <label class="mode-card">
+                                <input type="checkbox" checked value="auto" class="mode-checkbox">
+                                <span class="mode-icon">🛺</span>
+                                <span class="mode-name">Auto</span>
+                            </label>
+                            <label class="mode-card">
+                                <input type="checkbox" checked value="taxi" class="mode-checkbox">
+                                <span class="mode-icon">🚖</span>
+                                <span class="mode-name">Taxi</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <button id="calculate-btn" class="calculate-btn">
+                        Estimate Route Fares
+                    </button>
+                </div>
+
+                <div id="results-area" class="results-area">
+                    <div class="results-header">
+                        <div>
+                            <h3 class="results-title">Best Travel<br>Options</h3>
+                        </div>
+                        <div class="results-stats">
+                            <div class="stat-item">
+                                <span class="stat-label">Total Distance</span>
+                                <span id="total-distance-label" class="stat-value">0.0 km</span>
+                            </div>
+                            <div class="stat-item stat-border">
+                                <span class="stat-label">Travel Zone</span>
+                                <span id="travel-zone-label" class="stat-value">Mixed</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="fare-cards-container" class="fare-cards-grid">
+                        </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="gallery" class="gallery-section">
+            <div class="max-w-7xl mx-auto px-4">
+                <div class="gallery-header">
+                    <h2 class="gallery-title">City Highlights</h2>
+                    <p class="gallery-description">Explore Mumbai's most iconic landmarks and set them as your next destination.</p>
+                </div>
+                <div id="city-gallery" class="city-gallery-grid">
+                    </div>
+            </div>
+        </section>
+
+        <section id="about" class="about-section">
+            <div class="about-watermark">ROSHAN</div>
+            <div class="max-w-4xl mx-auto px-4 relative z-10">
+                <h2 class="about-title">About Project</h2>
+                <p class="about-description">
+                    Navigate Mumbai efficiently with real-time data and multi-modal transport options. 
+                    This Intelligent Multi-Modal Route Discovery system demonstrates the use of complex logic engines for city-specific transport rules.
+                </p>
+
+                <!-- Project Modules Grid -->
+                <div class="about-grid" style="margin-top: 4rem;">
+                    <div class="about-card">
+                        <h4 class="card-title">Smart Routing</h4>
+                        <p class="card-text">
+                            Uses geospatial algorithms (Haversine Formula) to calculate precise distances while accounting for road tortuosity.
+                        </p>
+                    </div>
+                    <div class="about-card">
+                        <h4 class="card-title">Policy Logic</h4>
+                        <p class="card-text">
+                            Includes built-in awareness of local rules, such as the specific auto-rickshaw restrictions in South Mumbai.
+                        </p>
+                    </div>
+                    <div class="about-card">
+                        <h4 class="card-title">Dynamic Fares</h4>
+                        <p class="card-text">
+                            Real-time cost estimation for Train, Metro, Bus, and Cabs based on the latest 2024 government rate cards.
+                        </p>
+                    </div>
+                    <div class="about-card tech-card">
+                        <h4 class="card-title">Digital Booking</h4>
+                        <p class="card-text">
+                            Features a fully simulated payment gateway with instant UPI QR generation for end-to-end ticketing.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer-section">
+        <div class="max-w-7xl mx-auto px-4 footer-grid">
+            <div class="footer-brand">
+                <h4 class="footer-title">Mumbai Route Finder</h4>
+                <div class="footer-squares">
+                    <div class="square blue"></div>
+                    <div class="square pink"></div>
+                    <div class="square yellow"></div>
+                </div>
+            </div>
+            <div class="footer-content">
+                <div class="footer-info-grid">
+                    <div class="developer-card">
+                        <h5 class="developer-label">Developer Profile</h5>
+                        <p class="developer-name">Roshan Nale</p>
+                        <p class="developer-details">Roll No: 5545 | Class: SY BSc IT (A)</p>
+                        <p class="developer-note">IV Semester Project Evaluation</p>
+                    </div>
+                    <div class="disclaimer-card">
+                        <p class="disclaimer-title">Institutional Disclaimer</p>
+                        <p class="disclaimer-text">
+                            This application is for educational purposes only. Fare estimations are based on static rate models.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span class="footer-copyright">&copy; 2026 Mumbai Route Finder Inc.</span>
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="app.js"></script>
+</body>
+</html>
