@@ -1,6 +1,6 @@
 # Mumbai Booking App
 
-## What it does (simple English)
+## What it does
 This is a straightforward web application designed to help users explore exciting locations and make event bookings across Mumbai. It provides a clean, user-friendly interface to browse places and secure bookings easily.
 
 ## Tech stack
